@@ -11,15 +11,10 @@ class TestModels(TestCase):
         password = 'TestPass123'
 
         user = get_user_model().objects.create_user(
+            username=email,
             email=email,
             password=password
         )
 
         self.assertEqual(user.email, email)
         self.assertTrue(user.check_password(password))
-
-    def test_add(self):
-        """
-        Test test
-        """
-        self.assertEqual(8, 9)
