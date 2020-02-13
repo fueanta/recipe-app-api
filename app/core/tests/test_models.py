@@ -18,3 +18,6 @@ class TestModels(TestCase):
 
         self.assertEqual(user.email, email)
         self.assertTrue(user.check_password(password))
+
+    def test_calc(self):
+        self.assertEqual(6, -6)
