@@ -4,11 +4,10 @@ from django.contrib.auth import get_user_model
 
 
 class AdminSiteTests(TestCase):
+    """Test cases for admin site functionality."""
 
     def setUp(self):
-        """
-        Creates users and forces admin login.
-        """
+        """Creates users and forces admin to login."""
         self.client = Client()
 
         self.admin_user = get_user_model().objects.create_superuser(
@@ -25,9 +24,8 @@ class AdminSiteTests(TestCase):
         )
 
     def test_users_listed(self):
-        """
-        Test: Users are listed on admin site.
-        """
+        """Testing if the users are listed on admin site."""
+
         url = reverse('admin:core_user_changelist')
         res = self.client.get(url)
 
@@ -35,18 +33,16 @@ class AdminSiteTests(TestCase):
         self.assertContains(res, self.user.email)
 
     def test_user_change_page(self):
-        """
-        Test: User edit page works.
-        """
+        """Testing if the User model edit page works on admin site."""
+
         url = reverse('admin:core_user_change', args=[self.user.id])
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, 200)
 
     def test_create_user_page(self):
-        """
-        Test: Create user page works.
-        """
+        """Testing if the User model create page works on admin site."""
+
         url = reverse('admin:core_user_add')
         res = self.client.get(url)
 

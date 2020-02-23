@@ -6,9 +6,13 @@ from core import models
 
 
 class UserAdmin(BaseUserAdmin):
+    """Admin view configuration for User model."""
+
+    # list page
     ordering = ['id']
     list_display = ['email', 'name']
 
+    # Edit Page
     fieldsets = (
         (_('Login Credentials'), {'fields': ('email', 'password')}),
         (_('Personal Information'), {'fields': ('name',)}),
@@ -17,6 +21,7 @@ class UserAdmin(BaseUserAdmin):
         (_('Important Dates'), {'fields': ('last_login',)})
     )
 
+    # Insertion Page
     add_fieldsets = (
         (_('Login Credentials'), {
             'classes': ('wide',),
