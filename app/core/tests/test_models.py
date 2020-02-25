@@ -70,3 +70,15 @@ class TestUserModel(TestCase):
         )
 
         self.assertEqual(str(ingredient), ingredient.name)
+
+    def test_recipe_object_representation(self):
+        """Testing if a recipe object is represented by its title."""
+
+        recipe = models.Recipe.objects.create(
+            title='Sreak and mashroom sauce',
+            time_in_minutes=5,
+            price=2.00,
+            user=sample_user(),
+        )
+
+        self.assertEqual(str(recipe), recipe.title)

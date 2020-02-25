@@ -67,3 +67,23 @@ class Ingredient(models.Model):
         """Defines the string representation of an object."""
 
         return self.name
+
+
+class Recipe(models.Model):
+    """Blueprint for recipe objects."""
+
+    title = models.CharField(max_length=255)
+    time_in_minutes = models.IntegerField()
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    link = models.CharField(max_length=255, blank=True)
+
+    ingredients = models.ManyToManyField(Ingredient)
+    tags = models.ManyToManyField(Tag)
+
+    user = models.ForeignKey(to=settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+
+    def __str__(self):
+        """Defines the string representation of an object."""
+
+        return self.title
