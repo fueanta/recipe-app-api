@@ -60,3 +60,13 @@ class TestUserModel(TestCase):
         )
 
         self.assertEqual(str(tag), tag.name)
+
+    def test_ingredient_object_representation(self):
+        """Testing if an ingredient object is represented by its name."""
+
+        ingredient = models.Ingredient.objects.create(
+            user=sample_user(),
+            name='Cucumber'
+        )
+
+        self.assertEqual(str(ingredient), ingredient.name)

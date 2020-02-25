@@ -54,3 +54,16 @@ class Tag(models.Model):
         """Defines the string representation of an object."""
 
         return self.name
+
+
+class Ingredient(models.Model):
+    """Ingredient model, to be used in a recipe."""
+
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(to=settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+
+    def __str__(self):
+        """Defines the string representation of an object."""
+
+        return self.name

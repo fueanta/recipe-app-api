@@ -26,7 +26,7 @@ def sample_tag(name, user):
 
 
 class PublicTagsApiTests(TestCase):
-    """Test publicly facing Tags API endpoints."""
+    """Test cases for publicly facing Tags API endpoints."""
 
     def setUp(self):
         self.client = APIClient()
