@@ -191,3 +191,67 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(ingredients.count(), 2)
         self.assertIn(ingredient1, ingredients)
         self.assertIn(ingredient2, ingredients)
+
+    def test_partial_update_recipe(self):
+        """Testing if a recipe can be updated partially:PATCH."""
+
+        recipe = sample_recipe(user=self.user)
+
+        tag = sample_tag(user=self.user)
+        recipe.tags.add(tag)
+
+        ingredient = sample_ingredient(user=self.user)
+        recipe.ingredients.add(ingredient)
+
+        new_tag = sample_tag(user=self.user, name='Dessert')
+
+        payload = {
+            "title": 'Coconut Salad',
+            "tags": [new_tag.id]
+        }
+
+        url = detail_url(recipe.id)
+
+        res = self.client.patch(url, payload)
+
+        recipe.refresh_from_db()
+
+        new_tags = recipe.tags.all()
+
+        ingredients = recipe.ingredients.all()
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(recipe.title, payload['title'])
+        self.assertIn(ingredient, ingredients)
+        self.assertIn(new_tag, new_tags)
+        self.assertNotIn(tag, new_tags)
+
+    def test_fully_update_recipe(self):
+        """Testing if a recipe can be updated fully:PUT."""
+
+        recipe = sample_recipe(user=self.user)
+        recipe.tags.add(sample_tag(user=self.user))
+        recipe.ingredients.add(sample_ingredient(user=self.user))
+
+        payload = {
+            "title": 'Coconut Salad',
+            "time_in_minutes": 15,
+            "price": 23.00,
+        }
+
+        url = detail_url(recipe.id)
+
+        res = self.client.put(url, payload)
+
+        recipe.refresh_from_db()
+
+        tags = recipe.tags.all()
+
+        ingredients = recipe.ingredients.all()
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(recipe.title, payload['title'])
+        self.assertEqual(recipe.time_in_minutes, payload['time_in_minutes'])
+        self.assertEqual(recipe.price, payload['price'])
+        self.assertEqual(tags.count(), 0)
+        self.assertEqual(ingredients.count(), 0)
