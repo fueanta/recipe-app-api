@@ -1,7 +1,10 @@
-from rest_framework import viewsets, mixins, authentication, permissions
+from rest_framework import viewsets, mixins, status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from core.models import Tag, Ingredient, Recipe
-
 from recipe import serializers
 
 
@@ -10,8 +13,8 @@ class BaseRecipeAttrViewSet(viewsets.GenericViewSet,
                             mixins.CreateModelMixin):
     """Base class for common recipe attribute classes."""
 
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         """Returns attr objects specific to the authenticated user."""
@@ -43,8 +46,8 @@ class IngredientViewSet(BaseRecipeAttrViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Manage recipes."""
 
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     serializer_class = serializers.RecipeSerializer
 
@@ -60,6 +63,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if self.action == 'retrieve':
             return serializers.RecipeDetailSerializer
+        elif self.action == 'upload_image':
+            return serializers.RecipeImageSerializer
 
         return self.serializer_class
 
@@ -67,3 +72,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Creates recipe object."""
 
         serializer.save(user=self.request.user)
+
+    @action(methods=['POST'], detail=True, url_path='upload-image')
+    def upload_image(self, request, pk=None):
+        """Upload an image to a recipe."""
+
+        recipe = self.get_object()
+
+        serializer = self.get_serializer(
+            recipe,
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
