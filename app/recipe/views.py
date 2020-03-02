@@ -27,7 +27,14 @@ class BaseRecipeAttrViewSet(viewsets.GenericViewSet,
     def get_queryset(self):
         """Returns attr objects specific to the authenticated user."""
 
-        return self.queryset.filter(user=self.request.user).order_by('-name')
+        assigned_only = bool(self.request.query_params.get('assigned_only'))
+
+        queryset = self.queryset
+
+        if assigned_only:
+            queryset = queryset.filter(recipe__isnull=False)
+
+        return queryset.filter(user=self.request.user).order_by('-name')
 
     def perform_create(self, serializer):
         """Creates recipe attr object."""
@@ -79,7 +86,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if ingredients:
             ingredient_ids = _params_to_ints(ingredients)
 
-            logging.getLogger('debugger').debug(f'Ingredient IDs: {ingredient_ids}')
+            logging.getLogger('debugger') \
+                .debug(f'Ingredient IDs: {ingredient_ids}')
 
             queryset = queryset.filter(ingredients__id__in=ingredient_ids)
 

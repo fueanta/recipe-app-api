@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Tag
+from core.models import Tag, Recipe
 from recipe.serializers import TagSerializer
 
 TAGS_URL = reverse('recipe:tag-list')
@@ -20,6 +20,19 @@ def sample_tag(name, user):
     """Creates and returns sample tag object for test."""
 
     return Tag.objects.create(name=name, user=user)
+
+
+def sample_recipe(user, **params):
+    """Creates and returns a sample recipe."""
+
+    defaults = {
+        'title': 'Sample recipe',
+        'time_in_minutes': 10,
+        'price': 5.00,
+    }
+    defaults.update(params)
+
+    return Recipe.objects.create(user=user, **defaults)
 
 
 class PublicTagsApiTests(TestCase):
@@ -97,3 +110,20 @@ class PrivateTagsApiTests(TestCase):
         res = self.client.post(TAGS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_tags_assigned_to_recipes(self):
+        """Test filtering tags by those assigned to recipes."""
+
+        tag = sample_tag(name='Breakfast', user=self.user)
+        tag2 = sample_tag(name='Lunch', user=self.user)
+
+        recipe = sample_recipe(user=self.user)
+        recipe.tags.add(tag)
+
+        res = self.client.get(path=TAGS_URL, data={'assigned_only': 1})
+
+        serializer = TagSerializer(tag)
+        serializer2 = TagSerializer(tag2)
+
+        self.assertIn(serializer.data, res.data)
+        self.assertNotIn(serializer2.data, res.data)

@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Ingredient
+from core.models import Ingredient, Recipe
 from recipe.serializers import IngredientSerializer
 
 INGREDIENTS_URL = reverse('recipe:ingredient-list')
@@ -20,6 +20,19 @@ def sample_ingredient(name, user):
     """Creates and returns sample ingredient object for test."""
 
     return Ingredient.objects.create(name=name, user=user)
+
+
+def sample_recipe(user, **params):
+    """Creates and returns a sample recipe."""
+
+    defaults = {
+        'title': 'Sample recipe',
+        'time_in_minutes': 10,
+        'price': 5.00,
+    }
+    defaults.update(params)
+
+    return Recipe.objects.create(user=user, **defaults)
 
 
 class PublicIngredientsApiTests(TestCase):
@@ -99,3 +112,20 @@ class PrivateIngredientsApiTests(TestCase):
         res = self.client.post(INGREDIENTS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_ingredients_assigned_to_recipes(self):
+        """Test filtering ingredients by those assigned to recipes."""
+
+        ingredient = sample_ingredient(name='Coconut', user=self.user)
+        ingredient2 = sample_ingredient(name='Lemon', user=self.user)
+
+        recipe = sample_recipe(user=self.user)
+        recipe.ingredients.add(ingredient)
+
+        res = self.client.get(path=INGREDIENTS_URL, data={'assigned_only': 1})
+
+        serializer = IngredientSerializer(ingredient)
+        serializer2 = IngredientSerializer(ingredient2)
+
+        self.assertIn(serializer.data, res.data)
+        self.assertNotIn(serializer2.data, res.data)
