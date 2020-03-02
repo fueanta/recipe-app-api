@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -6,6 +8,12 @@ from rest_framework.response import Response
 
 from core.models import Tag, Ingredient, Recipe
 from recipe import serializers
+
+
+def _params_to_ints(qs):
+    """Convert a list of string IDs to a list of integers."""
+
+    return [int(str_id) for str_id in qs.split(',')]
 
 
 class BaseRecipeAttrViewSet(viewsets.GenericViewSet,
@@ -54,9 +62,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
 
     def get_queryset(self):
-        """Returns list of recipes specific to the authenticated user."""
+        """Retrieve the recipes for the authenticated user"""
 
-        return self.queryset.filter(user=self.request.user).order_by('-id')
+        tags = self.request.query_params.get('tags')
+        ingredients = self.request.query_params.get('ingredients')
+
+        queryset = self.queryset
+
+        if tags:
+            tag_ids = _params_to_ints(tags)
+
+            logging.getLogger('debugger').debug(f'Tag IDs: {tag_ids}')
+
+            queryset = queryset.filter(tags__id__in=tag_ids)
+
+        if ingredients:
+            ingredient_ids = _params_to_ints(ingredients)
+
+            logging.getLogger('debugger').debug(f'Ingredient IDs: {ingredient_ids}')
+
+            queryset = queryset.filter(ingredients__id__in=ingredient_ids)
+
+        return queryset.filter(user=self.request.user).distinct()
 
     def get_serializer_class(self):
         """Returns appropriate serializer class based on action."""

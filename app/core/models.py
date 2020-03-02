@@ -63,6 +63,8 @@ class Tag(models.Model):
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
 
+    objects = models.Manager()
+
     def __str__(self):
         """Defines the string representation of an object."""
 
@@ -75,6 +77,8 @@ class Ingredient(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
+
+    objects = models.Manager()
 
     def __str__(self):
         """Defines the string representation of an object."""
@@ -96,6 +100,8 @@ class Recipe(models.Model):
 
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
+
+    objects = models.Manager()
 
     def __str__(self):
         """Defines the string representation of an object."""
