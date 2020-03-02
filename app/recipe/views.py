@@ -1,4 +1,4 @@
-import logging
+# import logging
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
@@ -79,15 +79,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if tags:
             tag_ids = _params_to_ints(tags)
 
-            logging.getLogger('debugger').debug(f'Tag IDs: {tag_ids}')
+            # logging.getLogger('debugger').debug(f'Tag IDs: {tag_ids}')
 
             queryset = queryset.filter(tags__id__in=tag_ids)
 
         if ingredients:
             ingredient_ids = _params_to_ints(ingredients)
 
-            logging.getLogger('debugger') \
-                .debug(f'Ingredient IDs: {ingredient_ids}')
+            # logging.getLogger('debugger') \
+            #     .debug(f'Ingredient IDs: {ingredient_ids}')
 
             queryset = queryset.filter(ingredients__id__in=ingredient_ids)
 
