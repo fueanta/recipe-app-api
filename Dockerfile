@@ -15,17 +15,13 @@ RUN mkdir /app
 WORKDIR /app
 COPY ./app /app
 
-RUN touch /app/debug.log
-
 RUN mkdir -p /vol/web/media
 RUN mkdir -p /vol/web/static
 
-RUN adduser -D user
-
-RUN chown -R user:user /app/debug.log
-RUN chmod -R 755 /app/debug.log
-
-RUN chown -R user:user /vol
+RUN chown -R /vol
 RUN chmod -R 755 /vol/web
 
-USER user
+#RUN adduser -D user
+#RUN chown -R user:user /vol
+#RUN chmod -R 755 /vol/web
+#USER user
