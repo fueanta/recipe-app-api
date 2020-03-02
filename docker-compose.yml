@@ -10,11 +10,7 @@ services:
       - ./app:/app
       - ./vol:/vol
     command: >
-      sh -c "rm -rf debugger.log &&
-             touch debugger.log &&
-             chown -R debugger.log &&
-             chmod -R 755 debugger.log &&
-             python manage.py wait_for_db &&
+      sh -c "python manage.py wait_for_db &&
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8080"
     environment:
